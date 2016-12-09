@@ -25,6 +25,8 @@
 
 #include <cstdlib>
 #include <stdexcept>
+#include <map>
+#include <stddef.h>
 
 enum class polygon_mode_t : unsigned int {
 	fill = 0u,
@@ -32,11 +34,18 @@ enum class polygon_mode_t : unsigned int {
 	point
 };
 
+
+
+
+
 static polygon_mode_t get_next_mode(polygon_mode_t mode)
 {
 	return static_cast<polygon_mode_t>((static_cast<unsigned int>(mode) + 1u) % 3u);
 }
-
+static glm::vec3 startPosition() {
+	float x = pow(rand() % 600 - 300, 2)/300;
+	return glm::vec3(x, (rand() % 500)/250, 9 - x);
+}
 bool testSphereSphere(glm::vec3 const&p1, float const r1, glm::vec3 const&p2, float const r2) {
 	return glm::length(p1 - p2) < (r1 + r2);
 }
@@ -69,7 +78,8 @@ eda221::Assignment5::~Assignment5()
 void eda221::Assignment5::run()
 {
 	// Loading the level geometry
-	auto const quad_shape = parametric_shapes::createQuad(2, 2, 10, 10);
+	auto const quad_shape = parametric_shapes::createQuad(100, 100);
+	
 	
 
 	// Set up the camera 
@@ -99,13 +109,12 @@ void eda221::Assignment5::run()
 			LogError("Failed to load diffuse shader");
 	};
 	reload_shaders();
-	
+
 	// Initializing the time variables.
 	f64 ddeltatime;
 	size_t fpsSamples = 0;
 	double nowTime, lastTime = GetTimeMilliseconds();
 	double fpsNextTick = lastTime + 1000.0;
-
 
 
 	// Set the uniforms of the shaders
@@ -115,6 +124,9 @@ void eda221::Assignment5::run()
 		glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
 		glUniform3fv(glGetUniformLocation(program, "camera_position"), 1, glm::value_ptr(camera_position));
 		glUniform1f(glGetUniformLocation(program, "time"), static_cast<float>(nowTime) / 1000.0f);
+
+
+
 	};
 
 	auto polygon_mode = polygon_mode_t::fill;
@@ -122,51 +134,18 @@ void eda221::Assignment5::run()
 	auto fireTex = loadTexture2D("flame.png");
 
 	//Fire Node
-	Node quad;
-	quad.set_geometry(quad_shape);
-	quad.add_texture("diffuse_texture",fireTex);
-	quad.set_program(diffuse_shader,set_uniforms);
-	quad.rotate_x(bonobo::pi/2);
-	quad.set_translation(glm::vec3(-5.0,0.0,5.0));
-	quad.rotate_y(0);
-
-	Node quad2;
-	quad2.set_geometry(quad_shape);
-	quad2.add_texture("diffuse_texture", fireTex);
-	quad2.set_program(diffuse_shader, set_uniforms);
-	quad2.rotate_x(bonobo::pi / 2);
-	quad2.set_translation(glm::vec3(-10.0, 0.0, 0.0));
-	//quad2.rotate_y(-bonobo::pi/6);
-	Node quad3;
-	quad3.set_geometry(quad_shape);
-	quad3.add_texture("diffuse_texture", fireTex);
-	quad3.set_program(diffuse_shader, set_uniforms);
-	quad3.rotate_x(bonobo::pi / 2);
-	quad3.set_translation(glm::vec3(-5.0, 0.0, -5.0));
-	//quad3.rotate_y(-bonobo::pi / 3);
-	Node quad4;
-	quad4.set_geometry(quad_shape);
-	quad4.add_texture("diffuse_texture", fireTex);
-	quad4.set_program(diffuse_shader, set_uniforms);
-	quad4.rotate_x(bonobo::pi / 2);
-	quad4.set_translation(glm::vec3(5.0, 0.0, -5.0));
-
-	Node quad5;
-	quad5.set_geometry(quad_shape);
-	quad5.add_texture("diffuse_texture", fireTex);
-	quad5.set_program(diffuse_shader, set_uniforms);
-	quad5.rotate_x(bonobo::pi / 2);
-	quad5.set_translation(glm::vec3(10.0, 0.0, 0.0));
-	//quad5.rotate_y(bonobo::pi / 3);
-	Node quad6;
-	quad6.set_geometry(quad_shape);
-	quad6.add_texture("diffuse_texture", fireTex);
-	quad6.set_program(diffuse_shader, set_uniforms);
-	quad6.rotate_x(bonobo::pi / 2);
-	quad6.set_translation(glm::vec3(5.0, 0.0, 5.0));
-	//quad6.rotate_y(bonobo::pi / 6);
-
-
+	const int MaxFires = 1;
+	glm::vec3 fires[MaxFires];
+	Node quad[MaxFires];
+	for (int i=0; i < MaxFires; i++) {
+		quad[i].set_geometry(quad_shape);
+		quad[i].add_texture("diffuse_texture", fireTex);
+		quad[i].set_program(diffuse_shader, set_uniforms);
+		//quad[i].scale(glm::vec3(0.1, 0.1, 0.1));
+		quad[i].rotate_x(bonobo::pi / 2);
+		fires[i] = startPosition();
+		quad[i].set_translation(fires[i]);
+	}
 
 	glEnable(GL_DEPTH_TEST);
 	// Enable face culling to improve performance:
@@ -213,24 +192,58 @@ void eda221::Assignment5::run()
 		if (inputHandler->GetKeycodeState(GLFW_KEY_R) & JUST_PRESSED) {
 			reload_shaders();
 		}
-		
+
 		camera_position = mCamera.mWorld.GetTranslation();
+
+
+
 		auto const window_size = window->GetDimensions();
 		glViewport(0, 0, window_size.x, window_size.y);
 		glClearDepthf(1.0f);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	//render here
-		quad.render(mCamera.GetWorldToClipMatrix(),quad.get_transform());
-		quad2.render(mCamera.GetWorldToClipMatrix(), quad2.get_transform());
-		quad3.render(mCamera.GetWorldToClipMatrix(), quad3.get_transform());
-		quad4.render(mCamera.GetWorldToClipMatrix(), quad4.get_transform());
-		quad5.render(mCamera.GetWorldToClipMatrix(), quad5.get_transform());
-		quad6.render(mCamera.GetWorldToClipMatrix(), quad6.get_transform());
+		//sort here
+		std::map<float, glm::vec3> sorted;
+		for (GLuint i = 0; i < MaxFires; i++) // windows contains all window positions
+		{
+			GLfloat distance = glm::length(camera_position - fires[i]);
+			sorted[distance] = fires[i];
+		}
+
+
+
+
+		//render here
+		int i = 0;
+		for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+		{	
+			
+
+
+
+
+			glm::vec3 position = it->second;
+			quad[i].set_translation(position);
+
+			auto normal_model_to_world = glm::transpose(glm::inverse(quad[i].get_transform()));
+
+			glm::vec3 up = glm::vec3(normal_model_to_world * glm::vec4(1.0,0.0,0.0,0.0));
+			glm::mat4 rotate = glm::lookAt(position,camera_position,up);
+			for (int j = 0; j < 4; j++) {
+				for (int k = 0; k < 4; k++) {
+					std::printf("%f ",rotate[j][k]);
+				}
+				std::printf("\n");
+			}
+				
+				
+			quad[i].render(mCamera.GetWorldToClipMatrix(),rotate,position);
+			i++;
+		}
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		
+
 		bool opened = ImGui::Begin("Scene Control", &opened, ImVec2(300, 100), -1.0f, 0);
 		if (opened) {
 			//ImGui::SliderFloat("Speed", &speed, 0.0f, 50.0f);
