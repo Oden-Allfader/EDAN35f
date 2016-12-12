@@ -14,10 +14,7 @@ namespace parametric_shapes
 	//! @return wrapper around OpenGL objects' name containing the geometry
 	//!         data
 	eda221::mesh_data createQuad(unsigned int width, unsigned int height);
-
-
 	eda221::mesh_data createQuad(unsigned int res_width, unsigned int res_height, unsigned int width, unsigned int height);
-
 	//! \brief Create a sphere for some tesselation level and make it
 	//!        available to OpenGL.
 	//!
@@ -37,7 +34,7 @@ namespace parametric_shapes
 	//! @param rB radius of the outermost border of the torus
 	//! @return wrapper around OpenGL objects' name containing the geometry
 	//!         data
-	//eda221::mesh_data createTorus(unsigned int const res_theta, unsigned int const res_phi, float const rA, float const rB);
+	eda221::mesh_data createTorus(unsigned int const res_theta, unsigned int const res_phi, float const rA, float const rB);
 
 	//! \brief Create a circle ring for some tesselation level and make it
 	//!        available to OpenGL.
