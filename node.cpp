@@ -17,7 +17,7 @@ Node::render(glm::mat4 const& WVP, glm::mat4 const& world) const
 }
 
 void
-Node::render(glm::mat4 const& WVP, glm::mat4 const& world, glm::mat4 const& view,glm::mat4 const& projection,glm::vec3 const& pos) const
+Node::render(glm::mat4 const& WVP, glm::mat4 const& world, glm::mat4 const& view, glm::mat4 const& projection, glm::vec3 const& pos) const
 {
 	render(WVP, world, view, projection, pos, _program, _set_uniforms);
 }
