@@ -17,15 +17,15 @@ Node::render(glm::mat4 const& WVP, glm::mat4 const& world) const
 }
 
 void
-Node::render(glm::mat4 const& WVP, glm::mat4 const& world, glm::vec3 const& pos) const
+Node::render(glm::mat4 const& WVP, glm::mat4 const& world, glm::mat4 const& view,glm::mat4 const& projection,glm::vec3 const& pos) const
 {
-	render(WVP, world, pos, _program, _set_uniforms);
+	render(WVP, world, view, projection, pos, _program, _set_uniforms);
 }
 
 
 
 void
-Node::render(glm::mat4 const& WVP, glm::mat4 const& world, glm::vec3 const& pos, GLuint program, std::function<void(GLuint)> const& set_uniforms) const
+Node::render(glm::mat4 const& WVP, glm::mat4 const& world, glm::mat4 const& view, glm::mat4 const& projection, glm::vec3 const& pos, GLuint program, std::function<void(GLuint)> const& set_uniforms) const
 {
 	if (_vao == 0u || program == 0u)
 		return;
@@ -37,6 +37,8 @@ Node::render(glm::mat4 const& WVP, glm::mat4 const& world, glm::vec3 const& pos,
 	set_uniforms(program);
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "vertex_model_to_world"), 1, GL_FALSE, glm::value_ptr(world));
+	glUniformMatrix4fv(glGetUniformLocation(program, "vertex_world_to_view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(program, "vertex_view_to_clip"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniform3fv(glGetUniformLocation(program, "billboard_position"), 1, glm::value_ptr(pos));
 	glUniformMatrix4fv(glGetUniformLocation(program, "normal_model_to_world"), 1, GL_FALSE, glm::value_ptr(normal_model_to_world));
 	glUniformMatrix4fv(glGetUniformLocation(program, "vertex_world_to_clip"), 1, GL_FALSE, glm::value_ptr(WVP));
@@ -70,7 +72,7 @@ Node::render(glm::mat4 const& WVP, glm::mat4 const& world, glm::vec3 const& pos,
 
 
 void
-Node::render(glm::mat4 const& WVP, glm::mat4 const& world, GLuint program, std::function<void (GLuint)> const& set_uniforms) const
+Node::render(glm::mat4 const& WVP, glm::mat4 const& world, GLuint program, std::function<void(GLuint)> const& set_uniforms) const
 {
 	if (_vao == 0u || program == 0u)
 		return;
@@ -126,7 +128,7 @@ Node::set_geometry(eda221::mesh_data const& shape)
 }
 
 void
-Node::set_program(GLuint program, std::function<void (GLuint)> const& set_uniforms)
+Node::set_program(GLuint program, std::function<void(GLuint)> const& set_uniforms)
 {
 	_program = program;
 	_set_uniforms = set_uniforms;
@@ -199,7 +201,7 @@ Node::scale(glm::vec3 const& s)
 glm::mat4x4
 Node::get_transform() const
 {
-	auto const scaling =  glm::scale(glm::mat4(), _scaling);
+	auto const scaling = glm::scale(glm::mat4(), _scaling);
 	auto const translating = glm::translate(glm::mat4(), _translation);
 	auto const rotation_x = glm::rotate(glm::mat4(), _rotation.x, glm::vec3(1.0, 0.0, 0.0));
 	auto const rotation_y = glm::rotate(glm::mat4(), _rotation.y, glm::vec3(0.0, 1.0, 0.0));

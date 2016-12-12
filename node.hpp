@@ -26,8 +26,8 @@ public:
 	//! @param [in] world Matrix transforming from model-space to
 	//!             world-space
 	void render(glm::mat4 const& WVP, glm::mat4 const& world) const;
-	void render(glm::mat4 const& WVP, glm::mat4 const& world, glm::vec3 const& pos) const;
-	void render(glm::mat4 const& WVP, glm::mat4 const& world,glm::vec3 const& pos,
+	void render(glm::mat4 const& WVP, glm::mat4 const& world, glm::mat4 const& view, glm::mat4 const& projection, glm::vec3 const& pos) const;
+	void render(glm::mat4 const& WVP, glm::mat4 const& world, glm::mat4 const& view, glm::mat4 const& projection, glm::vec3 const& pos,
 		GLuint program,
 		std::function<void(GLuint)> const& set_uniforms) const;
 	//! \brief Render this node with a specific shader program.
@@ -40,8 +40,8 @@ public:
 	//!             OpenGL shader program, and will setup that program's
 	//!             uniforms
 	void render(glm::mat4 const& WVP, glm::mat4 const& world,
-	            GLuint program,
-	            std::function<void (GLuint)> const& set_uniforms) const;
+		GLuint program,
+		std::function<void(GLuint)> const& set_uniforms) const;
 
 	//! \brief Set the geometry of this node.
 	//!
@@ -70,7 +70,7 @@ public:
 	//! @param [in] set_uniforms function that will take as argument an
 	//!             OpenGL shader program, and will setup that program's
 	//!             uniforms
-	void set_program(GLuint program, std::function<void (GLuint)> const& set_uniforms);
+	void set_program(GLuint program, std::function<void(GLuint)> const& set_uniforms);
 
 	//! \brief Add a texture to this node.
 	//!
@@ -177,7 +177,7 @@ private:
 
 	// Program data
 	GLuint _program;
-	std::function<void (GLuint)> _set_uniforms;
+	std::function<void(GLuint)> _set_uniforms;
 
 	// Textures data
 	std::vector<std::tuple<std::string, GLuint, GLenum>> _textures;
