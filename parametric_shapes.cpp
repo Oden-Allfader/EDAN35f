@@ -9,6 +9,9 @@
 #include <iostream>
 #include <vector>
 
+
+
+
 eda221::mesh_data
 parametric_shapes::createQuad(unsigned int width, unsigned int height)
 {
@@ -20,16 +23,16 @@ parametric_shapes::createQuad(unsigned int width, unsigned int height)
 
 
 	vertices = {
-		glm::vec3(-0.5*width,0.5*height,0.0),
-		glm::vec3(0.5*width, 0.5*height,0.0 ),
+		glm::vec3(-0.5*width, -0.5*height, 0.0),
 		glm::vec3(0.5*width, -0.5*height, 0.0),
-		glm::vec3(-0.5*width, -0.5*height, 0.0)
+		glm::vec3(0.5*width, 0.5*height,0.0),
+		glm::vec3(-0.5*width,0.5*height,0.0)
 	};
 	texcoords = {
-		glm::vec3(0.0,0.0,0.0),
-		glm::vec3(1.0,0.0,0.0),
+		glm::vec3(0.0,1.0,0.0),
 		glm::vec3(1.0,1.0,0.0),
-		glm::vec3(0.0,1.0,0.0)
+		glm::vec3(1.0,0.0,0.0),
+		glm::vec3(0.0,0.0,0.0)
 	};
 
 	auto indices = std::vector<glm::uvec3>(2);
