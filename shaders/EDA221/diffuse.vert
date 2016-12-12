@@ -15,6 +15,10 @@ layout (location = 2) in vec2 texcoords;
 uniform mat4 vertex_model_to_world;
 uniform mat4 normal_model_to_world;
 uniform mat4 vertex_world_to_clip;
+uniform vec3 billboard_position;
+uniform vec3 camera_position;
+uniform mat4 vertex_world_to_view;
+uniform mat4 vertex_view_to_clip;
 
 // This is the custom output of this shader. If you want to retrieve this data
 // from another shader further down the pipeline, you need to declare the exact
@@ -23,17 +27,39 @@ uniform mat4 vertex_world_to_clip;
 // shaders/EDA221/diffuse.frag.
 out VS_OUT {
 	vec3 vertex;
-	vec3 normal;
 	vec2 texCoord;
 } vs_out;
 
 
 void main()
-{
+{	
 	vs_out.vertex = vec3(vertex_model_to_world * vec4(vertex, 1.0));
-	vs_out.normal = vec3(normal_model_to_world * vec4(normal, 0.0));
+	mat4 ModelView = vertex_world_to_view*vertex_model_to_world;
+	// Column 0:
+	ModelView[0][0] = 1;
+	ModelView[0][1] = 0;
+	ModelView[0][2] = 0;
+
+	// Column 1:
+	ModelView[1][0] = 0;
+	ModelView[1][1] = 1;
+	ModelView[1][2] = 0;
+
+	// Column 2:
+	ModelView[2][0] = 0;
+	ModelView[2][1] = 0;
+	ModelView[2][2] = 1;
+
+	vec4 world_pos = vertex_model_to_world * vec4(vertex, 1.0);
+	vec4 look = normalize(vec4(camera_position,1.0) - vec4(billboard_position,1.0));
+	vec4 up = normalize(normal_model_to_world * vec4(1.0,0.0,0.0,0.0));
+	vec4 right = normalize(vec4(cross(look.xyz,up.xyz),0.0));
+
+	look = normalize(vec4(cross(right.xyz,up.xyz),0.0));
+
+	mat4 rotate = mat4(right, up, look, vec4(billboard_position,1.0));
 	vs_out.texCoord = texcoords;
-	gl_Position = vertex_world_to_clip * vertex_model_to_world * vec4(vertex, 1.0);
+	gl_Position = vertex_view_to_clip   *ModelView   * vec4(vertex, 1.0);
 }
 
 

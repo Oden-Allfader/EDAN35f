@@ -5,7 +5,6 @@ uniform sampler2D diffuse_texture;
 uniform float time;
 in VS_OUT {
 	vec3 vertex;
-	vec3 normal;
 	vec2 texCoord;
 } fs_in;
 
