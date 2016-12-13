@@ -38,8 +38,6 @@ enum class polygon_mode_t : unsigned int {
 
 
 
-
-
 static polygon_mode_t get_next_mode(polygon_mode_t mode)
 {
 	return static_cast<polygon_mode_t>((static_cast<unsigned int>(mode) + 1u) % 3u);
@@ -85,11 +83,9 @@ void eda221::Assignment5::run()
 	const int MaxFires = 10;
 	const int MaxSmokes = 30;
 
-
 	// Loading the level geometry
 	auto const fire_shape = parametric_shapes::createQuad(6, 6);
-
-	auto const smoke_shape = parametric_shapes::createQuad(2,1);
+	auto const smoke_shape = parametric_shapes::createQuad(2, 2);
 
 	// Set up the camera 
 	// Get the camera to follow the snake.
@@ -145,9 +141,7 @@ void eda221::Assignment5::run()
 		glUniform3fv(glGetUniformLocation(program, "light_position"), 1, glm::value_ptr(light_position));
 		glUniform3fv(glGetUniformLocation(program, "camera_position"), 1, glm::value_ptr(camera_position));
 		glUniform1f(glGetUniformLocation(program, "time"), static_cast<float>(nowTime) / 1000.0f);
-		glUniform1f(glGetUniformLocation(program, "number"),number);
-
-
+		glUniform1f(glGetUniformLocation(program, "number"), number);
 	};
 
 	auto polygon_mode = polygon_mode_t::fill;
@@ -162,11 +156,11 @@ void eda221::Assignment5::run()
 
 	//Initializing positions.
 	for (int i = 0; i < MaxFires; i++) {
-		quad[i ].set_geometry(fire_shape);
+		quad[i].set_geometry(fire_shape);
 		quad[i].add_texture("diffuse_texture", fireTex);
-		quad[ i].set_program(fire_shader, set_uniforms);
+		quad[i].set_program(fire_shader, set_uniforms);
 	}
-	fires[0] = glm::vec3(-2,0,0);
+	fires[0] = glm::vec3(-2, 0, 0);
 	quad[0].set_translation(fires[0]);
 	fires[1] = glm::vec3(-1.5, 0, -1.5);
 	quad[1].set_translation(fires[1]);
@@ -176,7 +170,7 @@ void eda221::Assignment5::run()
 	quad[3].set_translation(fires[3]);
 	fires[4] = glm::vec3(1.5, 0, 1.5);
 	quad[4].set_translation(fires[4]);
-	fires[5] = glm::vec3(-1.5, 0,1.5);
+	fires[5] = glm::vec3(-1.5, 0, 1.5);
 	quad[5].set_translation(fires[5]);
 	fires[6] = glm::vec3(-1, 0.5, -1);
 	quad[6].set_translation(fires[6]);
@@ -193,29 +187,14 @@ void eda221::Assignment5::run()
 	Node smokeQuad[MaxSmokes];
 	for (int i = 0; i < MaxSmokes; i++) {
 		smokeQuad[i].set_geometry(smoke_shape);
-		smokeQuad[i].add_texture("diffuse_texture",smokeTex);
-		smokeQuad[i].set_program(smoke_shader,set_uniforms);
-		smokes[i] = glm::vec3(0.0,i/2,0.0);
+		smokeQuad[i].add_texture("diffuse_texture", smokeTex);
+		smokeQuad[i].set_program(smoke_shader, set_uniforms);
+		smokes[i] = glm::vec3(0.0, i / 2, 0.0);
 		smokeQuad[i].set_translation(smokes[i]);
 	}
 
 
-	
 	////SMOKE ENDS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	glEnable(GL_DEPTH_TEST);
@@ -227,7 +206,7 @@ void eda221::Assignment5::run()
 
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	while (!glfwWindowShouldClose(window->GetGLFW_Window())) {
 		nowTime = GetTimeMilliseconds();
@@ -273,20 +252,20 @@ void eda221::Assignment5::run()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-		for (int i = 0; i < MaxSmokes/3; i++) {
-			smokes[i].x = sin((1000 * static_cast<float>(i) + nowTime) / 1500) + pow(sin(nowTime / 1900),2);
+		for (int i = 0; i < MaxSmokes / 3; i++) {
+			smokes[i].x = sin((1000 * static_cast<float>(i) + nowTime) / 1500) + pow(sin((1000 * static_cast<float>(i)+nowTime) / 1900), 2);
 			smokes[i].y = fmod((1000 * static_cast<float>(i) + nowTime) / 1000, 10);
 			smokes[i].z = sin((1000 * static_cast<float>(i) + nowTime) / 2000) + pow(sin(nowTime / 1000), 2);
 		}
-		for (int i = MaxSmokes/3; i < 2*MaxSmokes/3; i++) {
-			smokes[i].x = -1.0 - sin((1000 * static_cast<float>(i) + nowTime) / 1750) + pow(sin(nowTime / 1700), 2);
-			smokes[i].y = 1.0+fmod((1000 * static_cast<float>(i) + nowTime) / 1000, 10);
-			smokes[i].z = sin((1000 * static_cast<float>(i) + nowTime) / 1337) + pow(sin(nowTime / 1200), 3);
+		for (int i = MaxSmokes / 3; i < 2 * MaxSmokes / 3; i++) {
+			smokes[i].x = -1.0 - sin((1000 * static_cast<float>(i) + nowTime) / 1750) + pow(sin((1000 * static_cast<float>(i-10) + nowTime) / 1700), 2);
+			smokes[i].y = 1.0 + fmod((1000 * static_cast<float>(i) + nowTime) / 1000, 10);
+			smokes[i].z = sin((1000 * static_cast<float>(i) + nowTime) / 1337) + pow(sin((1000 * static_cast<float>(i) + nowTime) / 1200), 3);
 		}
-		for (int i = 2*MaxSmokes / 3; i < MaxSmokes ; i++) {
-			smokes[i].x = -1.5 + sin((1000 * static_cast<float>(i) + nowTime) / 1337) + pow(sin(nowTime / 1200), 3);
+		for (int i = 2 * MaxSmokes / 3; i < MaxSmokes; i++) {
+			smokes[i].x = -1.5 + sin((1000 * static_cast<float>(i) + nowTime) / 1337) + pow(sin((1000 * static_cast<float>(i-20) + nowTime) / 1200), 3);
 			smokes[i].y = 2.0 + fmod((1000 * static_cast<float>(i) + nowTime) / 1000, 10);
-			smokes[i].z = -1-sin((1000 * static_cast<float>(i) + nowTime) / 1337) + pow(sin(nowTime / 2000), 5);
+			smokes[i].z = -1 - sin((1000 * static_cast<float>(i) + nowTime) / 1337) - pow(sin((1000 * static_cast<float>(i-20) + nowTime) / 2000), 5);
 		}
 		//sort here
 		//std::map<float, glm::vec3> sorted;
@@ -295,7 +274,7 @@ void eda221::Assignment5::run()
 		//	GLfloat distance = glm::distance(camera_position, fires[i]);
 		//	sorted[distance] = fires[i];
 		//}
-		
+
 		//std::map<float, glm::vec3> sortedSmoke;
 		//for (GLuint i = 0; i < MaxSmokes; i++) // windows contains all window positions
 		//{
@@ -306,7 +285,7 @@ void eda221::Assignment5::run()
 
 		//render here
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		for (int i= 0; i < MaxFires; i++) {
+		for (int i = 0; i < MaxFires; i++) {
 			glm::vec3 q_position = glm::vec3(0, 0, 0);
 			quad[i].render(mCamera.GetWorldToClipMatrix(), quad[i].get_transform(), mCamera.GetWorldToViewMatrix(), mCamera.GetViewToClipMatrix(), q_position);
 		}
