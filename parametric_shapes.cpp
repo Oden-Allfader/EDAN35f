@@ -108,7 +108,6 @@ parametric_shapes::createQuad(unsigned int width, unsigned int height)
 	glBindVertexArray(0u);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0u);
 
-
 	return data;
 }
 
